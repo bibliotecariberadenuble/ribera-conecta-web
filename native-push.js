@@ -6,12 +6,13 @@
  async function unregister(){if(lastToken&&window.riberaApi){await window.riberaApi('/push/native/unregister','POST',{token:lastToken}).catch(()=>{});lastToken=null}}
  window.riberaNativePush={
   async enable(){const p=plugin();if(!p)throw Error('Disponible únicamente en la aplicación Android');
-   if(initialized){if(lastToken)await window.riberaApi('/push/native/register','POST',{token:lastToken});return;}
+   if(initialized){if(lastToken)await window.riberaApi('/push/native/register','POST',{token:lastToken});else await p.register();return;}
    const cfg=await window.riberaApi('/push/native/config');if(!cfg.enabled)throw Error('El servidor aún no tiene Firebase configurado');
    const status=await p.checkPermissions();const result=status.receive==='granted'?status:await p.requestPermissions();if(result.receive!=='granted')throw Error('Permiso de notificaciones denegado');
+   await p.createChannel({id:'ribera_comunicaciones',name:'Comunicaciones escolares',description:'Avisos de la comunidad escolar',importance:4,visibility:0,vibration:true});
    await p.addListener('registration',async t=>{lastToken=t.value;try{await window.riberaApi('/push/native/register','POST',{token:lastToken})}catch(e){console.warn('Registro push nativo fallido:',e.message)}});
    await p.addListener('registrationError',e=>console.warn('Error de registro nativo',e));
-   await p.addListener('pushNotificationActionPerformed',()=>{window.location.hash='#avisos'});
+   await p.addListener('pushNotificationActionPerformed',()=>{window.riberaOpenNotices?.()});
    initialized=true;await p.register();
   },unregister
  };
