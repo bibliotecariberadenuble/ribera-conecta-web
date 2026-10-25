@@ -1,4 +1,4 @@
-const CACHE='ribera-public-v3';
+const CACHE='ribera-public-v4';
 const BASE=new URL('./',self.location.href);
 const FILES=['','index.html','style.css','app.js','api-config.js','native-push.js','quick-actions.js','community.js','icon-192.png','icon-512.png','manifest.webmanifest','insignia-escuela.png','insignia-slep.png'];
 const ASSETS=FILES.map(x=>new URL(x,BASE).href);
