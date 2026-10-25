@@ -3,9 +3,12 @@
 (() => {
  let lastToken=null,initialized=false;
  function plugin(){return window.Capacitor?.isNativePlatform?.() ? window.Capacitor?.Plugins?.PushNotifications : null}
- async function unregister(){if(lastToken&&window.riberaApi){await window.riberaApi('/push/native/unregister','POST',{token:lastToken}).catch(()=>{});lastToken=null}}
+ function localSync(){return window.Capacitor?.isNativePlatform?.() ? window.Capacitor?.Plugins?.SchoolSync : null}
+ const sync=localSync();
+ if(sync)sync.addListener('openNotices',()=>{if(window.riberaOpenNotices)window.riberaOpenNotices();else window.riberaPendingNoticeOpen=true}).catch(()=>{});
+ async function unregister(){if(localSync())await localSync().disable();if(lastToken&&window.riberaApi){await window.riberaApi('/push/native/unregister','POST',{token:lastToken}).catch(()=>{});lastToken=null}}
  window.riberaNativePush={
-  async enable(){const p=plugin();if(!p)throw Error('Disponible únicamente en la aplicación Android');
+  async enable(){if(localSync())return localSync().enable({token:sessionStorage.getItem('ribera_token')||''});const p=plugin();if(!p)throw Error('Disponible únicamente en la aplicación Android');
    if(initialized){if(lastToken)await window.riberaApi('/push/native/register','POST',{token:lastToken});else await p.register();return;}
    const cfg=await window.riberaApi('/push/native/config');if(!cfg.enabled)throw Error('El servidor aún no tiene Firebase configurado');
    const status=await p.checkPermissions();const result=status.receive==='granted'?status:await p.requestPermissions();if(result.receive!=='granted')throw Error('Permiso de notificaciones denegado');
