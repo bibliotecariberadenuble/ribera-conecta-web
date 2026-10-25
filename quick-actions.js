@@ -23,7 +23,7 @@
    <button type="button" id="quickGuardian" ${canManage()?'':'disabled'}>Agregar apoderados al curso</button>
    <button type="button" id="quickTeacher" class="outline" ${canManage()?'':'disabled'}>Designar profesor de asignatura</button>
    <p class="quick-help">${canManage()?'Estas acciones se guardan en el curso que está seleccionado.':context.user?.role==='utp'?'Tu perfil UTP permite consultar evaluaciones y administrar tus propios avisos.':teacher()?'La gestión se habilita para el profesor jefe del curso y administración.':'Inicia sesión con una cuenta docente autorizada para gestionar tu curso.'}</p>
-   <div id="quickFormArea" aria-live="polite"></div></section>`;
+   ${canManage()?'<button type="button" class="outline" data-open-tab="ingresos">Inscripción automática y retiro de apoderados</button>':''}<div id="quickFormArea" aria-live="polite"></div></section>`;
   panel.querySelector('#quickGuardian').onclick=()=>open('guardian');
   panel.querySelector('#quickTeacher').onclick=()=>open('teacher');
   const claim=panel.querySelector('#quickClaimHead');if(claim)claim.onclick=async()=>{
